@@ -1,0 +1,3 @@
+2026-05-08 17:53:19 | ERROR    | from | log_use | __main__:<module>:4 - This is a error message
+2026-05-08 17:53:19 | INFO     | from | log_use | __main__:<module>:5 - This is a info message
+2026-05-08 17:53:19 | WARNING  | from | log_use | __main__:<module>:6 - This is a warning message
