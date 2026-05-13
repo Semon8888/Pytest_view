@@ -3,6 +3,7 @@
     <words>
       <w>Loguru</w>
       <w>alluredir</w>
+      <w>rerunfailures</w>
       <w>testpaths</w>
     </words>
   </dictionary>
