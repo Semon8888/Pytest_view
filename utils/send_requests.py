@@ -5,6 +5,7 @@ import requests
 class HttpRequests:
     """
     request 二次封装，支持所有HTTP请求
+    此方法已弃用，请调用公共方法库request_util
     """
 
     def __init__(self):
