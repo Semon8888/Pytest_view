@@ -1,3 +1,5 @@
+import random
+
 from testcases.projectA.log import Log
 
 log = Log.get_logger()

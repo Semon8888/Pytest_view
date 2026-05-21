@@ -30,12 +30,14 @@ def write_extract_file(data):
         yaml.dump(data, stream=f, allow_unicode=True)
 
 
+# 读取测试用例文件
+def read_testcases_file(case_path):
+    with open(case_path, 'r', encoding="utf-8") as f:
+        value = yaml.safe_load(f)
+        return value
+
+
 # 清空根目录下的extract文件内容
 def clean_extract_file():
     with open(get_project_root() + 'extract.yml', "w", encoding="utf-8") as f:
         f.truncate()
-
-
-if __name__ == '__main__':
-    file_data = {"access_token": "asd6f1as3f1as3df4a64f6asf16asdf"}
-    write_extract_file(file_data)
