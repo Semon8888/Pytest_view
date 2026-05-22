@@ -1,4 +1,5 @@
 "DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
-"","0","test_login","testcases.projectA","2026-05-20","passed","2026-05-20","TestLogin","test_login","",""
-"","0","test_get_user","testcases.projectA","2026-05-20","passed","2026-05-20","TestLogin","test_login","",""
-"","721","test_get1[case_info0]","testcases.projectA","2026-05-20","broken","2026-05-20","TestRequest","test_request","",""
+"","0","test_logout","testcases.projectB","2026-05-22","passed","2026-05-22","TestLogout","test_logout","",""
+"","229","test_connect_baidu","testcases.projectB","2026-05-22","passed","2026-05-22","TestLogout","test_logout","",""
+"","0","test_click_element","testcases.projectB","2026-05-22","passed","2026-05-22","TestLogout","test_logout","",""
+"","833","test_gzh[case_info0]","testcases.projectB","2026-05-22","broken","2026-05-22","TestGzh","test_gzh","",""

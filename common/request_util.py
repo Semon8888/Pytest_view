@@ -97,9 +97,9 @@ class RequestsUtil:
                 files = None
                 if jsonpath.jsonpath(case_info, '$..files'):
                     files = case_info['request']['files']  # 此处返回一个字典
-                    for key, value in case_info['files'].items():  # 此处通过key, value 遍历字典, 把文件打开后重新赋值给key
+                    for key, value in files.items():  # 此处通过key, value 遍历字典, 把文件打开后重新赋值给key
                         files[key] = open(value, "rb")
-                    files = open(case_info['request']['files'], 'rb')
+                    # files = open(case_info['request']['files'], 'rb')
                     # 此处因为要构造发送请求函数中的**kwargs可变参数,所以用完后要删除掉,不然就会进入到可变参数中
                     del case_info['request']['files']
 
@@ -107,6 +107,8 @@ class RequestsUtil:
                 response = self.send_request(method=method, url=url, headers=headers, files=files,
                                              **case_info['request'])
                 response_data = response.json()
+                status_code = response.status_code
+
                 # 如果处理登录或者其他有接口关联的用例, 需要把关联数据写入extract.yml文件中
                 # 提取接口关联的变量, 既要支持正则提取,又要支持json提取
                 if 'extract' in case_info.keys():
@@ -124,6 +126,10 @@ class RequestsUtil:
                             extract_data = {key: response_data[value]}
                             # 数据关联字典写进extract.yml文件中
                             write_extract_file(extract_data)
+                # 在返回结果中提取断言数据, 后续用做断言判断条件
+                expect_result = case_info['validate']  # except_result是测试用例文件里面的定义
+                # 提前定义一个断言方法,后续实现[此处的response_data是请求后的相应json数据]
+                self.validate_result(expect_result, response_data, status_code)
 
                 return response
             else:
@@ -153,10 +159,7 @@ class RequestsUtil:
             response = RequestsUtil.session.request(method=last_method, url=self.base_url, headers=self.last_headers,
                                                     **kwargs)
             response.raise_for_status()
-            # 此处需要加入断言判断
             return response
-
-
         except requests.exceptions.Timeout:
             print("Request timed out")
             raise
@@ -167,11 +170,43 @@ class RequestsUtil:
             print("HTTP error {}".format(err))
             raise
 
-    def validate_result(self, expect_result, actual_result):
-        pass
+    # 断言封装
+    def validate_result(self, expect_result, actual_result, status_code):
+        # 断言代码需要根据项目做封装,基础逻辑就是通过测试用例中的预期断言结果和发送请求后返回的数据进行断言
+        # 首先定义一个断言是否成功的标签flag=0, 如果flag!=0 则用例断言失败
+        # 每做一个非等断言后使flag = flag + 1 <这里需要做非等必失败断言>
+        # 以下开始解析数据
+        """
+        :param expect_result: 预期结果
+        :param actual_result: 实际结果
+        :param status_code: 实际的状态码
+        :return:
+        """
+        flag = 0
+        if expect_result and isinstance(actual_result, list):
+            for ep in expect_result:
+                for key, value in ep.items():
+                    # 判断断言方式
+                    if key == 'equals':
+                        for assert_key, assert_value in value.items():
+                            if assert_key == "status_code":
+                                if status_code != assert_value:
+                                    flag = flag + 1
+                                    print("断言失败: " + assert_key + "不等于" + assert_value)
+                            else:
+                                key_list = jsonpath.jsonpath(actual_result, '$..{}'.format(assert_key))
+                                if key_list:
+                                    if assert_value not in key_list:
+                                        flag = flag + 1
+                                        print("断言失败: " + assert_key + "不等于" + assert_value)
+                                else:
+                                    flag = flag + 1
+                                    print("断言失败: 返回结果中不存在 " + assert_key)
+                    elif key == 'contains':
+                        if value not in json.dumps(actual_result):
+                            flag = flag + 1
+                            print("断言失败: 返回结果中不包含字符串" + value)
+                        else:
+                            print("框架不支持此断言")
 
-# if __name__ == '__main__':
-#     dic_data = {"tag": {"id": 108, "name": "semon_industry ${get_randint_num(100, 999)}"}}
-#     # dic_data = {"tag": {"id": 108, "name": "semon_industry ${say_hello}"}}
-#     result = RequestsUtil.replace_hot_load(dic_data)
-#     print(result)
+        assert flag
