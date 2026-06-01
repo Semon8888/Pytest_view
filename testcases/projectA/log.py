@@ -22,7 +22,7 @@ class Log:
     # 重写new方法，构造单例模式
     def __new__(cls, *args, **kwargs):
         if not cls._isinstance:
-            cls._isinstance = super().__new__(cls)
+            cls._isinstance = super().__new__(cls, *args, **kwargs)
         return cls._isinstance
 
     def __init__(self, *args, **kwargs):
